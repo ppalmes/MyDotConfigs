@@ -1,0 +1,92 @@
+#compinit
+unalias rm
+autoload -Uz promptinit
+promptinit
+
+export TERM="xterm-256color"
+setopt interactivecomments
+setopt clobber
+
+source "$HOME/.sshagent"
+source "$HOME/.aliases"
+source "$HOME/.shortcuts"
+
+export JULIA_EDITOR="lvim"
+export R_HISTFILE=~/.Rhistory
+
+#--------
+# use vim as an editor
+export EDITOR=lvim
+# automatically enter directories without cd
+setopt auto_cd
+
+# vi mode
+bindkey -v
+bindkey "^F" vi-cmd-mode
+bindkey jj vi-cmd-mode
+# add some readline keys back
+bindkey "^A" beginning-of-line
+bindkey "^E" end-of-line
+# handy keybindings
+bindkey '^O' clear-screen
+bindkey "^Y" accept-and-hold
+bindkey "^D" delete-char
+bindkey "^B" backward-char
+bindkey "^F" forward-char
+bindkey -s "^T" "^[Isudo ^[A" # "t" for "toughguy"
+# use incremental search
+#bindkey "^[[A" history-beginning-search-backward # arrow up
+bindkey "^[[A" history-beginning-search-backward-end # arrow up
+bindkey "^[[B" history-beginning-search-forward-end  # arrow down
+bindkey '^P' history-substring-search-up
+bindkey '^N' history-substring-search-down
+bindkey "^R" history-beginning-search-backward-end
+#bindkey "^S" history-beginning-search-backward-end
+#bindkey "^P" history-search-backward
+#bindkey "^N" insert-last-word
+
+autoload -U history-search-end
+zle -N history-beginning-search-backward-end history-search-end
+
+# expand functions in the prompt
+setopt prompt_subst
+# ignore duplicate history entries
+setopt histignoredups
+# keep TONS of history
+export HISTSIZE=4096
+# automatically pushd
+setopt auto_pushd
+export dirstacksize=5
+# awesome cd movements from zshkit
+setopt AUTOCD
+setopt AUTOPUSHD PUSHDMINUS PUSHDSILENT PUSHDTOHOME
+setopt cdablevars
+
+# Enable extended globbing
+setopt EXTENDED_GLOB
+
+# RVM
+#[[ -s '/Users/pma/.rvm/scripts/rvm' ]] && source '/Users/pma/.rvm/scripts/rvm'
+bindkey '\e.' insert-last-word
+
+export JULIA_NUM_THREADS=8
+
+# http://grml.org/zsh/zsh-lovers.html
+zstyle ':completion:*:*:kill:*' menu yes select
+zstyle ':completion:*:kill:*'   force-list always
+zstyle ':completion:*' squeeze-slashes true
+
+source <(kubectl completion zsh)
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -s "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
+
+# enable fasd
+#eval "$(fasd --init auto)"
+fasd_cache="$HOME/.fasd-init-zsh"
+if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
+  fasd --init auto >| "$fasd_cache"
+fi
+source "$fasd_cache"
+unset fasd_cache
+
+export PATH=~/.arkade/bin:$PATH:/opt/homebrew/anaconda3/bin
